@@ -11862,7 +11862,7 @@ div#notebook {
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><strong>Answer:</strong></p>
-<p>The SmartCab just sits still and doesn't move. It is rewarded for doing nothing on occasion, when the light turns red, because stopping at a red light is good. But it generally gets negative rewards for sitting idle when the light is green. It makes no progress towards the goal.</p>
+<p>The SmartCab just sits still and doesn't move. It is rewarded for doing nothing on occasion, when the light turns red, because stopping at a red light is good. But it generally gets negative rewards for sitting idle when the light is green. Sometimes it can get a positive reward for idling at a green light, when the goal is a left turn and there's oncoming traffic. But, with sitting still perpetually, it makes no progress towards the goal.</p>
 
 </div>
 </div>
@@ -13030,7 +13030,8 @@ TkSuQmCC
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><strong>Answer:</strong></p>
-<p>Suprisingly, not all the actions are terrible. I would imagine with such a random walker, that the cab would get in lots of wrecks. The major and minor accident rates are relatively low given this random behavior. Both are below 10%. The major contributor to bad behavior is Major Violations (20%+), which is probably the number of red lights we run.  Reliability is also only averaging at 20%, which makes sense since our cab has no code to get it to the goal. It just randomly walks wherever chance takes it. Also, the rewards which the cab receives are very negative. This makes sense when viewed with the large amount of Major Violations we are committing, and the fact that we aren't respecting any rules at all. We are just randomly walking. And there are plenty of ways to perform badly in traffic (negative rewards), and only a small subset of good actions (positive rewards).</p>
+<p>Suprisingly, not all the actions are terrible. I would imagine with such a random walker, that the cab would get in lots of wrecks. The major and minor accident rates are relatively low given this random behavior. Both are below 10%. The major contributor to bad behavior is Major Violations (20%+), which is probably the number of red lights we run.  Reliability is also only averaging at 20%, which makes sense since our cab has no code to get it to the goal. It just randomly walks wherever chance takes it. Also, the rewards which the cab receives are very negative. This makes sense when viewed with the large amount of Major Violations we are committing, and the fact that we aren't respecting any rules at all. We are just randomly walking. And there are plenty of ways to perform badly in traffic (negative rewards), and only a small subset of good actions (positive rewards).
+As the iterations of trials increases, the performance doesn't get better and really doesn't get much worse either. Since it's a random behavior it is basically doing a poor job always. No amount of iterations will change that.</p>
 <p>Given this bad behavior, it's not surprising that it got an F rating in both Safety and Reliability.</p>
 
 </div>
@@ -13084,9 +13085,9 @@ TkSuQmCC
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><strong>Answer:</strong></p>
-<p>The inputs (left,oncoming and light) are very important variables to learn safe driving behaviors. The presence of other cars on the road, and the chance for collision will be informed by left/right/oncoming. Also the color of the light informs the learner about what actions will follow driving rules, and which lead to violations.</p>
+<p>The inputs (left,oncoming and light) are very important variables to learn safe driving behaviors. The presence of other cars on the road, and the chance for collision will be informed by left/oncoming. Also the color of the light informs the learner about what actions will follow driving rules, and which lead to violations.</p>
 <p>The waypoint variable will help the learner gain efficiency. The ultimate goal of the cab is to reach the destination in a timely manner. This variable will help the learner keep marching towards the goal.</p>
-<p>The right input isn't strictly necessary because we have left and oncoming. Also deadline is interesting data, but won't necessarily help the learner since it can't change its actions based on that data. So I won't use either of those variables in my state.</p>
+<p>The right input isn't strictly necessary because we have left and oncoming, and the light. When the light is red, we don't have to worry about cars coming from the right because we won't move anyways. And when the light is green, cars to the right cannot impact our motion. Only oncoming cars on green lights, and cars from the left on red lights. So the right is not needed at all. Also deadline is interesting data, but won't necessarily help the learner since it can't change its actions based on that data. Also, since deadline can take on very high numeric values, the state space explodes if we include it. This is undesireable because of the time it would take to train and cover the state space. So I won't use either of those variables in my state.</p>
 
 </div>
 </div>
@@ -13120,7 +13121,7 @@ TkSuQmCC
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><strong>Answer:</strong></p>
-<p>Well, the 'left' and 'oncoming' variables can all take 4 values. And light can take 2. So multiplying those permutations together makes a state space of 32 states. Multiply by the waypoint permutations and we get 128!</p>
+<p>Well, the 'left' and 'oncoming' variables can both take 4 values. And light can take 2. So multiplying those permutations together makes a state space of 32 states. Multiply by the waypoint permutations of 3 and we get 96!</p>
 
 </div>
 </div>
@@ -16174,7 +16175,8 @@ I used an epsilon decay that was constant for many iterations (100+) and then a 
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p><strong>Answer:</strong> 
-An optimal policy for a red light would be 'None' or to stay idle. An optimal policy for a green light would be to take the path specified by the waypoint, yielding to traffic. So if the waypoint is forward and I have a green light, then the optimal policy is to move forward.</p>
+An optimal policy for a red light would be 'None' or to stay idle. Additionally, a policy for a right turn is optimal if there is no traffic coming from the left.</p>
+<p>An optimal policy for a green light would be to take the path specified by the waypoint, yielding to traffic. So if the waypoint is forward and I have a green light, then the optimal policy is to move forward, yielding to left turners of oncoming traffic.</p>
 <p>The policies in the text file all seem to reflect correct optimal policies.
 This example:</p>
 <blockquote><p>('forward', 'green', None, None)</p>
