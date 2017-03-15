@@ -16177,7 +16177,7 @@ I used an epsilon decay that was constant for many iterations (100+) and then a 
 <p><strong>Answer:</strong> 
 An optimal policy for a red light would be 'None' or to stay idle. Additionally, a policy for a right turn is optimal if there is no traffic coming from the left.</p>
 <p>An optimal policy for a green light would be to take the path specified by the waypoint, yielding to traffic. So if the waypoint is forward and I have a green light, then the optimal policy is to move forward, yielding to left turners of oncoming traffic.</p>
-<p>The policies in the text file all seem to reflect correct optimal policies.
+<p>Most policies in the text file seem to reflect correct optimal policies.
 This example:</p>
 <blockquote><p>('forward', 'green', None, None)</p>
 <p>-- forward : 1.68</p>
@@ -16186,6 +16186,29 @@ This example:</p>
 <p>-- left : 0.77</p>
 </blockquote>
 <p>shows a correct optimal policy. With a forward goal and a green light and no traffic, the best policy is to move forward. That's exactly what is shown here. Obviously moving in any direction is an ok decision, because it potentially gets you closer to the goal. The worst policy is to stay still. This is all shown in the Q-table for that state.</p>
+<p>There are a few suboptimal policies that show through, however.
+These examples:</p>
+<blockquote><p>('forward', 'green', 'left', 'right')</p>
+<p>-- forward : 0.00</p>
+<p>-- right : 0.00</p>
+<p>-- None : 0.86</p>
+<p>-- left : 0.00</p>
+</blockquote>
+<p>If the goal is to drive forward and you have green, even in the presence of the oncoming turning left, the forward state should probably have a non-zero weight. This probably shows a state that was not well explored during learning.</p>
+<blockquote><p>('right', 'red', 'right', 'right')</p>
+<p>-- forward : 0.00</p>
+<p>-- right : 0.00</p>
+<p>-- None : 1.55</p>
+<p>-- left : 0.00</p>
+</blockquote>
+<p>If the goal is to drive right at a red light, which is allowable yielding to traffic, the right weight should probably be non-zero. This probabaly shows a state that was not well explored during learning.</p>
+<blockquote><p>('right', 'red', 'right', 'left')</p>
+<p>-- forward : 0.00</p>
+<p>-- right : 0.00</p>
+<p>-- None : 1.19</p>
+<p>-- left : 0.00</p>
+</blockquote>
+<p>If the goal is to drive right at a red light, which is allowable yielding to traffic, the right weight should probably be non-zero. This probabaly shows a state that was not well explored during learning.</p>
 
 </div>
 </div>
